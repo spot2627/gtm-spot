@@ -38,16 +38,22 @@
     function goOffline() { window.location.href = 'offline.html'; }
     function goOnline()  { window.location.href = CF_URL; }
 
-    // Timeout de 5 segundos
-    var timer = setTimeout(goOffline, 5000);
+    var xhr = new XMLHttpRequest();
+    xhr.timeout = 5000;
 
-    // Tenta carregar o favicon do Streamlit como imagem.
-    // Streamlit retorna PNG binario valido -> onload -> online.
-    // Cloudflare erro 1033 retorna HTML -> nao e imagem valida -> onerror -> offline.
-    var img = new Image();
-    img.onload = function() { clearTimeout(timer); goOnline(); };
-    img.onerror = function() { clearTimeout(timer); goOffline(); };
-    img.src = CF_URL + '/favicon.ico?' + Date.now();
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        goOnline();
+      } else {
+        goOffline();
+      }
+    };
+
+    xhr.onerror   = function() { goOffline(); };
+    xhr.ontimeout = function() { goOffline(); };
+
+    xhr.open('GET', CF_URL + '/healthz');
+    xhr.send();
   </script>
 </body>
 </html>
