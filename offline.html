@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GTM Setorizado -- Indisponivel</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Calibri, Arial, sans-serif;
+      background: #1B3A6B;
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      text-align: center;
+      padding: 48px 40px;
+      max-width: 520px;
+      width: 90%;
+      background: rgba(255,255,255,0.07);
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .logo {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 32px;
+    }
+    .icon { font-size: 56px; margin-bottom: 20px; }
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #ffffff;
+    }
+    .horario-info {
+      font-size: 14px;
+      color: rgba(255,255,255,0.65);
+      margin-bottom: 28px;
+    }
+    .status-box {
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 28px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .status-fora  { border-left: 4px solid #e67e22; }
+    .status-dentro { border-left: 4px solid #2ecc71; }
+    .relogio {
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+    .data {
+      font-size: 13px;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 28px;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 12px 28px;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.25);
+      transition: background 0.2s;
+    }
+    .btn:hover { background: rgba(255,255,255,0.25); }
+    .rodape {
+      margin-top: 36px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">GTM Setorizado &mdash; SPOT / Camil</div>
+    <div class="icon">⚙️</div>
+    <h1>Sistema temporariamente indisponivel</h1>
+    <p class="horario-info">Disponivel de segunda a sexta, das 8h as 17h</p>
+
+    <div class="relogio" id="relogio">--:--:--</div>
+    <div class="data" id="data">--</div>
+
+    <div class="status-box" id="status-box">
+      <span id="status-msg">Verificando horario...</span>
+    </div>
+
+    <a class="btn" onclick="location.reload()">&#8635; Tentar novamente</a>
+
+    <div class="rodape">GTM Setorizado &bull; SPOT Promotora &bull; Camil JOB 198000</div>
+  </div>
+
+  <script>
+    var DIAS = ['domingo','segunda','terca','quarta','quinta','sexta','sabado'];
+    var DIAS_PT = ['Domingo','Segunda-feira','Terca-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sabado'];
+    var MESES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+
+    function pad(n) { return n < 10 ? '0' + n : n; }
+
+    function atualizar() {
+      var now  = new Date();
+      var h    = now.getHours();
+      var min  = now.getMinutes();
+      var seg  = now.getSeconds();
+      var dow  = now.getDay();
+      var dia  = now.getDate();
+      var mes  = now.getMonth();
+      var ano  = now.getFullYear();
+
+      document.getElementById('relogio').textContent =
+        pad(h) + ':' + pad(min) + ':' + pad(seg);
+
+      document.getElementById('data').textContent =
+        DIAS_PT[dow] + ', ' + dia + ' de ' + MESES[mes] + ' de ' + ano;
+
+      var fds    = (dow === 0 || dow === 6);
+      var fora_h = (h < 8 || h >= 17);
+      var box    = document.getElementById('status-box');
+      var msg    = document.getElementById('status-msg');
+
+      if (fds || fora_h) {
+        box.className = 'status-box status-fora';
+        if (fds) {
+          msg.innerHTML = '&#128308; <strong>Fora do horario de atendimento.</strong><br>' +
+            'O sistema opera apenas nos dias uteis.';
+        } else if (h < 8) {
+          msg.innerHTML = '&#128308; <strong>Fora do horario de atendimento.</strong><br>' +
+            'O sistema estara disponivel a partir das 8h.';
+        } else {
+          msg.innerHTML = '&#128308; <strong>Fora do horario de atendimento.</strong><br>' +
+            'O sistema encerrou as 17h. Retorne amanha.';
+        }
+      } else {
+        box.className = 'status-box status-dentro';
+        msg.innerHTML = '&#128994; <strong>Sistema iniciando ou em manutencao.</strong><br>' +
+          'Voce esta dentro do horario. Tente novamente em alguns minutos.';
+      }
+    }
+
+    atualizar();
+    setInterval(atualizar, 1000);
+  </script>
+</body>
+</html>
