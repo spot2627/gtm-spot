@@ -48,20 +48,16 @@
     }
 
     function checkHealth(onSuccess, onFail) {
-      var img = new Image();
-      var timer = setTimeout(function() {
-        img.onload = img.onerror = null;
-        onFail();
-      }, 5000);
-      img.onload = function() {
-        clearTimeout(timer);
-        onSuccess();
-      };
-      img.onerror = function() {
-        clearTimeout(timer);
-        onFail();
-      };
-      img.src = CF_URL + '/favicon.ico?' + Date.now();
+      var timer = setTimeout(onFail, 5000);
+      fetch(CF_URL, { method: 'HEAD', mode: 'no-cors' })
+        .then(function() {
+          clearTimeout(timer);
+          onSuccess();
+        })
+        .catch(function() {
+          clearTimeout(timer);
+          onFail();
+        });
     }
 
     if (isAdmin) {
