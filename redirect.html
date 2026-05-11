@@ -53,7 +53,7 @@
       xhr.onload  = function() { xhr.status === 200 ? onSuccess() : onFail(); };
       xhr.onerror   = function() { onFail(); };
       xhr.ontimeout = function() { onFail(); };
-      xhr.open('GET', CF_URL + '/healthz');
+      xhr.open('GET', CF_URL + '/_stcore/health');
       xhr.send();
     }
 
