@@ -35,25 +35,33 @@
   <script>
     var CF_URL = "https://programmers-induction-asked-daily.trycloudflare.com";
 
+    var params  = new URLSearchParams(window.location.search);
+    var isAdmin = params.get('admin') === 'gtmspot2024';
+
     function goOffline() { window.location.href = 'offline.html'; }
     function goOnline()  { window.location.href = CF_URL; }
 
-    var xhr = new XMLHttpRequest();
-    xhr.timeout = 5000;
+    function showAdminOffline() {
+      document.querySelector('.spinner').style.display = 'none';
+      document.querySelector('h2').textContent = 'Sistema offline.';
+      document.querySelector('p').textContent  = 'Inicie o bat para subir o app.';
+    }
 
-    xhr.onload = function() {
-      if (xhr.status === 200) {
-        goOnline();
-      } else {
-        goOffline();
-      }
-    };
+    function checkHealth(onSuccess, onFail) {
+      var xhr    = new XMLHttpRequest();
+      xhr.timeout = 5000;
+      xhr.onload  = function() { xhr.status === 200 ? onSuccess() : onFail(); };
+      xhr.onerror   = function() { onFail(); };
+      xhr.ontimeout = function() { onFail(); };
+      xhr.open('GET', CF_URL + '/healthz');
+      xhr.send();
+    }
 
-    xhr.onerror   = function() { goOffline(); };
-    xhr.ontimeout = function() { goOffline(); };
-
-    xhr.open('GET', CF_URL + '/healthz');
-    xhr.send();
+    if (isAdmin) {
+      checkHealth(goOnline, showAdminOffline);
+    } else {
+      checkHealth(goOnline, goOffline);
+    }
   </script>
 </body>
 </html>
