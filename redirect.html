@@ -33,13 +33,13 @@
   </div>
 
   <script>
-    var CF_URL = "https://raid-original-patch-romance.trycloudflare.com";
+    var STATUS_URL = 'https://raw.githubusercontent.com/spot2627/gtm-spot/main/status.json?ts=' + Date.now();
 
     var params  = new URLSearchParams(window.location.search);
     var isAdmin = params.get('admin') === 'gtmspot2024';
 
     function goOffline() { window.location.href = 'offline.html'; }
-    function goOnline()  { window.location.href = CF_URL; }
+    function goOnline(url)  { window.location.href = url; }
 
     function showAdminOffline() {
       document.querySelector('.spinner').style.display = 'none';
@@ -47,24 +47,18 @@
       document.querySelector('p').textContent  = 'Inicie o bat para subir o app.';
     }
 
-    function checkHealth(onSuccess, onFail) {
-      var timer = setTimeout(onFail, 5000);
-      fetch(CF_URL, { method: 'HEAD', mode: 'no-cors' })
-        .then(function() {
-          clearTimeout(timer);
-          onSuccess();
-        })
-        .catch(function() {
-          clearTimeout(timer);
-          onFail();
-        });
-    }
-
-    if (isAdmin) {
-      checkHealth(goOnline, showAdminOffline);
-    } else {
-      checkHealth(goOnline, goOffline);
-    }
+    fetch(STATUS_URL)
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.online && data.url) {
+          goOnline(data.url);
+        } else {
+          isAdmin ? showAdminOffline() : goOffline();
+        }
+      })
+      .catch(function() {
+        isAdmin ? showAdminOffline() : goOffline();
+      });
   </script>
 </body>
 </html>
