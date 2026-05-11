@@ -48,13 +48,20 @@
     }
 
     function checkHealth(onSuccess, onFail) {
-      var xhr    = new XMLHttpRequest();
-      xhr.timeout = 5000;
-      xhr.onload  = function() { xhr.status === 200 ? onSuccess() : onFail(); };
-      xhr.onerror   = function() { onFail(); };
-      xhr.ontimeout = function() { onFail(); };
-      xhr.open('GET', CF_URL + '/_stcore/health');
-      xhr.send();
+      var img = new Image();
+      var timer = setTimeout(function() {
+        img.onload = img.onerror = null;
+        onFail();
+      }, 5000);
+      img.onload = function() {
+        clearTimeout(timer);
+        onSuccess();
+      };
+      img.onerror = function() {
+        clearTimeout(timer);
+        onFail();
+      };
+      img.src = CF_URL + '/favicon.ico?' + Date.now();
     }
 
     if (isAdmin) {
