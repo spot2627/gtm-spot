@@ -47,18 +47,29 @@
       document.querySelector('p').textContent  = 'Inicie o bat para subir o app.';
     }
 
-    fetch(STATUS_URL)
-      .then(function(r) { return r.json(); })
-      .then(function(data) {
-        if (data.online && data.url) {
-          goOnline(data.url);
-        } else {
+    function dentroDoHorario() {
+      var now = new Date();
+      var dow = now.getDay();   // 0=dom, 1=seg ... 5=sex, 6=sab
+      var h   = now.getHours();
+      return dow >= 1 && dow <= 5 && h >= 8 && h < 17;
+    }
+
+    if (!isAdmin && !dentroDoHorario()) {
+      goOffline();
+    } else {
+      fetch(STATUS_URL)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.online && data.url) {
+            goOnline(data.url);
+          } else {
+            isAdmin ? showAdminOffline() : goOffline();
+          }
+        })
+        .catch(function() {
           isAdmin ? showAdminOffline() : goOffline();
-        }
-      })
-      .catch(function() {
-        isAdmin ? showAdminOffline() : goOffline();
-      });
+        });
+    }
   </script>
 </body>
 </html>
